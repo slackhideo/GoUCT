@@ -4,6 +4,8 @@
 #define __BOARD_H__
 
 #include "Node.h"
+#include <cstdlib>
+#include <cmath>
 #define BOARD_SIZE 9
 
 typedef struct m {
@@ -19,11 +21,12 @@ class Board {
 
 		Board();
 		virtual ~Board();
-		Node* getBestChild(Node root);
-		Node* UCTSelect(Node node);
-		int playSimulation(Node node);
+		Node* getBestChild(Node& root);
+		Node* UCTSelect(Node& node);
+		int playSimulation(Node& node);
 		Move UCTSearch(int time);
-		createChildren(Node root);
+		bool createChildren(Node& root);
+		bool isLegalPlay(int player, int x, int y);
 
 };
 #endif /* __BOARD_H__ */
