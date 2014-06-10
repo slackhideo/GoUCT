@@ -71,7 +71,18 @@ int Board::playSimulation(Node& node) {
 	return randomresult;
 }
 
-Move Board::UCTSearch(int time) {
+Move* Board::UCTSearch(int time) {
+	Node root(-1,-1);
+	createChildren(root);
+
+	Board clone;
+	for(int i = 0; i < time; i++) {
+		clone.copyStateFrom(this);
+		clone.playSimulation(root);
+	}
+
+	Node* n = getBestChild(root);
+	return new Move(n->x, n->y);
 }
 
 bool Board::createChildren(Node& root) {
@@ -98,4 +109,12 @@ bool Board::createChildren(Node& root) {
 
 bool Board::isLegalPlay(int player, int x, int y) {
 	return true;
+}
+
+void Board::copyStateFrom(const Board* orig) {
+	for(int i = 0; i < BOARD_SIZE; i++) {
+		for(int j = 0; j < BOARD_SIZE; j++) {
+			this->b[i][j] = orig->b[i][j];
+		}
+	}
 }
