@@ -27,7 +27,10 @@ class Board {
 		void copyStateFrom(const Board* orig);
 		void makeMove(int x, int y);
 		void makeMove(const Move* move);
+		void makeRandomMove();
 		int playRandomGame();
+		bool isFinished();
+		int getWinner();
 
 		friend std::ostream & operator<<(std::ostream & os, const Board &board);
 };

@@ -43,7 +43,7 @@ Node* Board::UCTSelect(Node& node) {
 			uctvalue = winrate + uct;
 		}
 		else {
-			uctvalue = 10000 + 1000*(rand()%10000);
+			uctvalue = 10000 + 1000*(rand()%1000);
 		}
 
 		if(uctvalue > best_uct) {
@@ -113,6 +113,7 @@ bool Board::createChildren(Node& root) {
 }
 
 bool Board::isLegalPlay(int player, int x, int y) {
+	if(this->b[x][y] != 0) return false;
 	return true;
 }
 
@@ -133,11 +134,38 @@ void Board::makeMove(const Move* move) {
 	this->b[move->x][move->y] = this->player;
 }
 
+void Board::makeRandomMove() {
+	
+	int x = rand()%BOARD_SIZE;
+	int y = rand()%BOARD_SIZE;
+	while(!isLegalPlay(this->player, x, y)) {
+		x = rand()%BOARD_SIZE;
+		y = rand()%BOARD_SIZE;
+	}
+
+	this->makeMove(x, y);
+}
+
 int Board::playRandomGame() {
 	// TODO:
 	// -- Find the end position of a game
 	// -- consider illegal plays in the board
 	// -- Find out who won from an end game
+	
+	int cur_player = this->player;
+	while(!isFinished()) {
+		makeRandomMove();
+		this->player = this->player == 1 ? 2 : 1;
+	}
+
+	return getWinner() == cur_player ? 1 : 0;
+}
+
+bool Board::isFinished() {
+	return true;
+}
+
+int Board::getWinner() {
 	return 1;
 }
 
