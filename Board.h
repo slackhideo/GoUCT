@@ -23,6 +23,7 @@ class Board {
 		int playSimulation(Node& node);
 		Move* UCTSearch(int time);
 		bool createChildren(Node& root);
+		void deleteChildren(Node* root);
 		bool isLegalPlay(int player, int x, int y);
 		void copyStateFrom(const Board* orig);
 		void makeMove(int x, int y);
@@ -31,6 +32,7 @@ class Board {
 		int playRandomGame();
 		bool isFinished();
 		int getWinner();
+		bool isDead(int x, int y);
 
 		friend std::ostream & operator<<(std::ostream & os, const Board &board);
 };

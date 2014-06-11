@@ -2,6 +2,7 @@
 
 #include "Board.h"
 
+/* Board class */
 Board::Board() {
 	this->player = 1;
 	this->root = new Node(-1, -1);
@@ -15,6 +16,7 @@ Board::Board() {
 Board::~Board() {
 }
 
+/* Select the child from a Node with the most number of simulations */
 Node* Board::getBestChild(Node& root) {
 	Node* child = root.child;
 	Node* best_child = NULL;
@@ -30,6 +32,7 @@ Node* Board::getBestChild(Node& root) {
 	return best_child;
 }
 
+/* Select the best child from a Node based on UCT value */
 Node* Board::UCTSelect(Node& node) {
 	Node* res = NULL;
 	Node* next = node.child;
@@ -57,6 +60,7 @@ Node* Board::UCTSelect(Node& node) {
 	return res;
 }
 
+/* Plays a game simulation and returns who was the winner saving the wins and games on the tree nodes */
 int Board::playSimulation(Node& node) {
 	int randomresult = 0;
 	if(node.child == NULL && node.visits < 10) {
@@ -76,6 +80,7 @@ int Board::playSimulation(Node& node) {
 	return randomresult;
 }
 
+/* Makes simulations and plays the best move possible */
 Move* Board::UCTSearch(int time) {
 	Node root(-1,-1);
 	createChildren(root);
@@ -90,6 +95,7 @@ Move* Board::UCTSearch(int time) {
 	return new Move(n->x, n->y);
 }
 
+/* Create all possible moves from Node root */
 bool Board::createChildren(Node& root) {
 	Node* last = NULL;
 	bool ret = false;
@@ -112,11 +118,20 @@ bool Board::createChildren(Node& root) {
 	return ret;
 }
 
+/* Checks if the move is legal */
 bool Board::isLegalPlay(int player, int x, int y) {
+	bool result;
+
 	if(this->b[x][y] != 0) return false;
-	return true;
+
+	// Check if suicide play
+	this->b[x][y] = player;
+	result = isDead(x, y);
+	this->b[x][y] = 0;
+	return result;
 }
 
+/* Copies the board state */
 void Board::copyStateFrom(const Board* orig) {
 	for(int i = 0; i < BOARD_SIZE; i++) {
 		for(int j = 0; j < BOARD_SIZE; j++) {
@@ -126,14 +141,19 @@ void Board::copyStateFrom(const Board* orig) {
 	this->player = orig->player;
 }
 
+/* Plays a move on the board with the coordinates (x,y) */
 void Board::makeMove(int x, int y) {
 	this->b[x][y] = this->player;
+	this->player = 3 - this->player;
 }
 
+/* Plays a move on the board with Move object */
 void Board::makeMove(const Move* move) {
 	this->b[move->x][move->y] = this->player;
+	this->player = 3 - this->player;
 }
 
+/* Random chooses a position on the board to play. Tries until a legal move is found */
 void Board::makeRandomMove() {
 	
 	int x = rand()%BOARD_SIZE;
@@ -146,6 +166,7 @@ void Board::makeRandomMove() {
 	this->makeMove(x, y);
 }
 
+/* Plays random moves until endgame and returns the winner */
 int Board::playRandomGame() {
 	// TODO:
 	// -- Find the end position of a game
@@ -155,18 +176,32 @@ int Board::playRandomGame() {
 	int cur_player = this->player;
 	while(!isFinished()) {
 		makeRandomMove();
-		this->player = this->player == 1 ? 2 : 1;
+		this->player = 3 - this->player;
 	}
 
 	return getWinner() == cur_player ? 1 : 0;
 }
 
+/* Checks the board state and returns if the game is finished */
 bool Board::isFinished() {
 	return true;
 }
 
+/* Checks the endgame board state and returns the winner of the game */
 int Board::getWinner() {
 	return 1;
+}
+
+/* Checks if a group of pieces is dead */
+bool Board::isDead(int x, int y) {
+	// first checks if there is any liberty on the sides
+	if((x > 0 && b[x-1][y] == 0) || (y < BOARD_SIZE-1 && b[x][y+1] == 0) ||
+	 (x < BOARD_SIZE-1 && b[x+1][y] == 0) || (y > 0 && b[x][y-1] == 0)) {
+		return false;
+	}
+		
+
+	return true;
 }
 
 std::ostream & operator<<(std::ostream & os, const Board &board) {
@@ -188,5 +223,5 @@ std::ostream & operator<<(std::ostream & os, const Board &board) {
 		}
 		os << endl;
 	}
-    return os;
+	return os;
 }
