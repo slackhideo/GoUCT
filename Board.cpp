@@ -5,6 +5,11 @@
 Board::Board() {
 	this->player = 1;
 	this->root = new Node(-1, -1);
+	for(int i = 0; i < BOARD_SIZE; i++) {
+		for(int j = 0; j < BOARD_SIZE; j++) {
+			this->b[i][j] = 0;
+		}
+	}
 }
 
 Board::~Board() {
@@ -55,13 +60,13 @@ Node* Board::UCTSelect(Node& node) {
 int Board::playSimulation(Node& node) {
 	int randomresult = 0;
 	if(node.child == NULL && node.visits < 10) {
-	//	randomresult = playRandomGame();
+		randomresult = playRandomGame();
 	}
 	else {
 		if(node.child == NULL) createChildren(node);
 
 		Node* next = UCTSelect(node);
-		//Makemove(next->x, next->y)
+		makeMove(next->x, next->y);
 		
 		int res = playSimulation(*next);
 		randomresult = 1-res;
@@ -117,4 +122,43 @@ void Board::copyStateFrom(const Board* orig) {
 			this->b[i][j] = orig->b[i][j];
 		}
 	}
+	this->player = orig->player;
+}
+
+void Board::makeMove(int x, int y) {
+	this->b[x][y] = this->player;
+}
+
+void Board::makeMove(const Move* move) {
+	this->b[move->x][move->y] = this->player;
+}
+
+int Board::playRandomGame() {
+	// TODO:
+	// -- Find the end position of a game
+	// -- consider illegal plays in the board
+	// -- Find out who won from an end game
+	return 1;
+}
+
+std::ostream & operator<<(std::ostream & os, const Board &board) {
+	using namespace std;
+
+	for(int i = 0; i < BOARD_SIZE; i++) {
+		for(int j = 0; j < BOARD_SIZE; j++) {
+			switch(board.b[i][j]) {
+			case 0:
+				os << ". ";
+				break;
+			case 1:
+				os << "X ";
+				break;
+			case 2:
+				os << "O ";
+				break;
+			}
+		}
+		os << endl;
+	}
+
 }

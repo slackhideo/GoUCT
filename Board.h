@@ -5,6 +5,7 @@
 
 #include "Node.h"
 #include "Move.h"
+#include <iostream>
 #include <cstdlib>
 #include <cmath>
 #define BOARD_SIZE 9
@@ -24,6 +25,10 @@ class Board {
 		bool createChildren(Node& root);
 		bool isLegalPlay(int player, int x, int y);
 		void copyStateFrom(const Board* orig);
+		void makeMove(int x, int y);
+		void makeMove(const Move* move);
+		int playRandomGame();
 
+		friend std::ostream & operator<<(std::ostream & os, const Board &board);
 };
 #endif /* __BOARD_H__ */
