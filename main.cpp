@@ -18,21 +18,27 @@ int main(int argc, char *argv[]) {
 
     srand(time(0));
 
-    board.makeMove(0,1);
-    board.makeMove(0,2);
-    board.makeMove(1,2);
-    board.makeMove(1,3);
-    board.makeMove(2,1);
-    board.makeMove(2,2);
-    board.makeMove(1,0);
-    board.makeMove(2,3);
     board.makeMove(0,3);
+    cout << "-------------------" << endl << board;
+    board.makeMove(0,2);
+    cout << "-------------------" << endl << board;
+    board.makeMove(1,2);
+    cout << "-------------------" << endl << board;
+    board.makeMove(0,1);
+    cout << "-------------------" << endl << board;
+    board.makeMove(1,1);
+    cout << "-------------------" << endl << board;
+    board.makeMove(0,0);
+    cout << "-------------------" << endl << board;
+    board.makeMove(1,0);
+    cout << "-------------------" << endl << board;
 
-    //test = board.UCTSearch(1000);
-    //board.makeMove(test);
+    test = board.UCTSearch(1000);
+    board.makeMove(test);
+    delete test;
     //for(int i = 0; i < 50; i++) {
     //    board.makeRandomMove();
     //}
-    cout << board;
+    cout << "-------------------" << endl << board;
     cout << "OK" << endl;
 }

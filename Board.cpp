@@ -14,6 +14,7 @@ Board::Board() {
 }
 
 Board::~Board() {
+	delete(this->root);
 }
 
 /* Changes the current player */
@@ -152,12 +153,12 @@ void Board::makeMove(int x, int y) {
 	if(isLegalPlay(x,y)) {
 		this->b[x][y] = this->player;
 		this->changePlayer();
+		// Checks and removes if move captures any stone
+		if(x > 0 && b[x-1][y] == this->player && isDead(x-1,y)) removeGroup(x-1,y);
+		if(y < BOARD_SIZE-1 && b[x][y+1] == this->player && isDead(x,y+1)) removeGroup(x,y+1);
+		if(x < BOARD_SIZE-1 && b[x+1][y] == this->player && isDead(x+1,y)) removeGroup(x+1,y);
+		if(y > 0 && b[x][y-1] == this->player && isDead(x,y-1)) removeGroup(x,y-1);
 	}
-	// Checks and removes if move captures any stone
-	if(x > 0 && isDead(x-1,y)) removeGroup(x-1,y);
-	if(y < BOARD_SIZE-1 && isDead(x,y+1)) removeGroup(x,y+1);
-	if(x < BOARD_SIZE-1 && isDead(x+1,y)) removeGroup(x+1,y);
-	if(y > 0 && isDead(x,y-1)) removeGroup(x,y-1);
 }
 
 /* Plays a move on the board with Move object */
@@ -167,12 +168,12 @@ void Board::makeMove(const Move* move) {
 	if(isLegalPlay(x,y)) {
 		this->b[x][y] = this->player;
 		this->changePlayer();
+		// Checks and removes if move captures any stone
+		if(x > 0 && b[x-1][y] == this->player && isDead(x-1,y)) removeGroup(x-1,y);
+		if(y < BOARD_SIZE-1 && b[x][y+1] == this->player && isDead(x,y+1)) removeGroup(x,y+1);
+		if(x < BOARD_SIZE-1 && b[x+1][y] == this->player && isDead(x+1,y)) removeGroup(x+1,y);
+		if(y > 0 && b[x][y-1] == this->player && isDead(x,y-1)) removeGroup(x,y-1);
 	}
-	// Checks and removes if move captures any stone
-	if(x > 0 && isDead(x-1,y)) removeGroup(x-1,y);
-	if(y < BOARD_SIZE-1 && isDead(x,y+1)) removeGroup(x,y+1);
-	if(x < BOARD_SIZE-1 && isDead(x+1,y)) removeGroup(x+1,y);
-	if(y > 0 && isDead(x,y-1)) removeGroup(x,y-1);
 }
 
 /* Random chooses a position on the board to play. Tries until a legal move
@@ -217,7 +218,6 @@ int Board::getWinner() {
 }
 
 /* Checks if a group of pieces is dead */
-// TODO
 bool Board::isDead(int x, int y) {
 	// first checks if there is any liberty on the sides
 	if((x > 0 && b[x-1][y] == 0) || (y < BOARD_SIZE-1 && b[x][y+1] == 0) ||
@@ -258,20 +258,27 @@ bool Board::isDead(int x, int y) {
 	return !(north && west && south && east);
 }
 
-void Board::removeGroup(int x, int y) {
+int Board::removeGroup(int x, int y) {
 	int group = b[x][y];
+
+	int north = 0;
+	int east = 0;
+	int south = 0;
+	int west = 0;
 
 	b[x][y] = 0;
 	// if(group == 1) captures2++;
 	// else captures1++;
 	// removes north if from the same group
-	if(x > 0 && b[x-1][y] == group) removeGroup(x-1,y);
+	if(x > 0 && b[x-1][y] == group) north = removeGroup(x-1,y);
 	// removes east if from the same group
-	if(y < BOARD_SIZE-1 && b[x][y+1] == group) removeGroup(x,y+1);
+	if(y < BOARD_SIZE-1 && b[x][y+1] == group) east = removeGroup(x,y+1);
 	// removes south if from the same group
-	if(x < BOARD_SIZE-1 && b[x+1][y] == group) removeGroup(x+1,y);
+	if(x < BOARD_SIZE-1 && b[x+1][y] == group) south = removeGroup(x+1,y);
 	// removes west if from the same group
-	if(y > 0 && b[x][y-1] == group) removeGroup(x,y-1);
+	if(y > 0 && b[x][y-1] == group) west = removeGroup(x,y-1);
+
+	return 1+north+east+south+west;
 }
 
 std::ostream & operator<<(std::ostream & os, const Board &board) {

@@ -36,7 +36,7 @@ class Board {
 		bool isFinished();
 		int getWinner();
 		bool isDead(int x, int y);
-		void removeGroup(int x, int y);
+		int removeGroup(int x, int y);
 
 		friend std::ostream & operator<<(std::ostream & os, const Board &board);
 };

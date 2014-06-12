@@ -13,7 +13,8 @@ Node::Node(int x, int y) {
 }
 
 Node::~Node() {
-// TODO: run through the tree deleting its leaves
+	if(this->sibling != NULL) delete(this->sibling);
+	if(this->child != NULL) delete(this->child);
 }
 
 void Node::update(int val) {
