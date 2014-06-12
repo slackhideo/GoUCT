@@ -1,5 +1,6 @@
 /* Node.cpp */
 
+#include <cstdlib>
 #include "Node.h"
 
 Node::Node(int x, int y) {
@@ -7,6 +8,12 @@ Node::Node(int x, int y) {
     this->visits = 0;
     this->x = x;
     this->y = y;
+    this->child = NULL;
+    this->sibling = NULL;
+}
+
+Node::~Node() {
+// TODO: run through the tree deleting its leaves
 }
 
 void Node::update(int val) {

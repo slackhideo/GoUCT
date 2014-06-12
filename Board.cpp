@@ -16,6 +16,11 @@ Board::Board() {
 Board::~Board() {
 }
 
+/* Changes the current player */
+void Board::changePlayer() {
+	this->player = 3 - this->player;
+}
+
 /* Select the child from a Node with the most number of simulations */
 Node* Board::getBestChild(Node& root) {
 	Node* child = root.child;
@@ -60,7 +65,8 @@ Node* Board::UCTSelect(Node& node) {
 	return res;
 }
 
-/* Plays a game simulation and returns who was the winner saving the wins and games on the tree nodes */
+/* Plays a game simulation and returns who was the winner saving the wins and
+ * games on the tree nodes */
 int Board::playSimulation(Node& node) {
 	int randomresult = 0;
 	if(node.child == NULL && node.visits < 10) {
@@ -95,13 +101,13 @@ Move* Board::UCTSearch(int time) {
 	return new Move(n->x, n->y);
 }
 
-/* Create all possible moves from Node root */
+/* Creates all possible moves from root Node */
 bool Board::createChildren(Node& root) {
 	Node* last = NULL;
 	bool ret = false;
 	for(int i = 0; i < BOARD_SIZE; i++) {
 		for(int j = 0; j < BOARD_SIZE; j++) {
-			if(this->b[i][j] == 0 && isLegalPlay(this->player, i, j)) {
+			if(this->b[i][j] == 0 && isLegalPlay(i, j)) {
 				ret = true;
 				if(last == NULL) {
 					root.child = new Node(i,j);
@@ -119,16 +125,16 @@ bool Board::createChildren(Node& root) {
 }
 
 /* Checks if the move is legal */
-bool Board::isLegalPlay(int player, int x, int y) {
-	bool result;
+bool Board::isLegalPlay(int x, int y) {
+	bool result = false;
 
-	if(this->b[x][y] != 0) return false;
+	if(this->b[x][y] != 0) return result;
 
 	// Check if suicide play
-	this->b[x][y] = player;
+	this->b[x][y] = this->player;
 	result = isDead(x, y);
 	this->b[x][y] = 0;
-	return result;
+	return !result;
 }
 
 /* Copies the board state */
@@ -144,21 +150,22 @@ void Board::copyStateFrom(const Board* orig) {
 /* Plays a move on the board with the coordinates (x,y) */
 void Board::makeMove(int x, int y) {
 	this->b[x][y] = this->player;
-	this->player = 3 - this->player;
+	this->changePlayer();
 }
 
 /* Plays a move on the board with Move object */
 void Board::makeMove(const Move* move) {
 	this->b[move->x][move->y] = this->player;
-	this->player = 3 - this->player;
+	this->changePlayer();
 }
 
-/* Random chooses a position on the board to play. Tries until a legal move is found */
+/* Random chooses a position on the board to play. Tries until a legal move
+ * is found */
 void Board::makeRandomMove() {
 	
 	int x = rand()%BOARD_SIZE;
 	int y = rand()%BOARD_SIZE;
-	while(!isLegalPlay(this->player, x, y)) {
+	while(!isLegalPlay(x, y)) {
 		x = rand()%BOARD_SIZE;
 		y = rand()%BOARD_SIZE;
 	}
@@ -175,24 +182,26 @@ int Board::playRandomGame() {
 	
 	int cur_player = this->player;
 	while(!isFinished()) {
-		makeRandomMove();
-		this->player = 3 - this->player;
+		this->makeRandomMove();
 	}
 
 	return getWinner() == cur_player ? 1 : 0;
 }
 
 /* Checks the board state and returns if the game is finished */
+// TODO
 bool Board::isFinished() {
 	return true;
 }
 
 /* Checks the endgame board state and returns the winner of the game */
+// TODO
 int Board::getWinner() {
 	return 1;
 }
 
 /* Checks if a group of pieces is dead */
+// TODO
 bool Board::isDead(int x, int y) {
 	// first checks if there is any liberty on the sides
 	if((x > 0 && b[x-1][y] == 0) || (y < BOARD_SIZE-1 && b[x][y+1] == 0) ||

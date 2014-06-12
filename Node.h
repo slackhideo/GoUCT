@@ -14,6 +14,7 @@ class Node {
         Node *sibling;
 
         Node(int x, int y);
+        virtual ~Node();
         void update(int val);
         double getWinRate();
 };

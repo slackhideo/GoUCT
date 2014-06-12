@@ -18,13 +18,14 @@ class Board {
 
 		Board();
 		virtual ~Board();
+        void changePlayer();
 		Node* getBestChild(Node& root);
 		Node* UCTSelect(Node& node);
 		int playSimulation(Node& node);
 		Move* UCTSearch(int time);
 		bool createChildren(Node& root);
 		void deleteChildren(Node* root);
-		bool isLegalPlay(int player, int x, int y);
+		bool isLegalPlay(int x, int y);
 		void copyStateFrom(const Board* orig);
 		void makeMove(int x, int y);
 		void makeMove(const Move* move);
