@@ -14,11 +14,13 @@ class Board {
 	public:
 		int b[BOARD_SIZE][BOARD_SIZE];
 		int player;
+		double moku1;
+		double moku2;
 		Node* root;
 
 		Board();
 		virtual ~Board();
-        void changePlayer();
+		void changePlayer();
 		Node* getBestChild(Node& root);
 		Node* UCTSelect(Node& node);
 		int playSimulation(Node& node);
@@ -34,6 +36,7 @@ class Board {
 		bool isFinished();
 		int getWinner();
 		bool isDead(int x, int y);
+		void removeGroup(int x, int y);
 
 		friend std::ostream & operator<<(std::ostream & os, const Board &board);
 };

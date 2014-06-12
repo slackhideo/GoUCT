@@ -14,14 +14,25 @@ int main(int argc, char *argv[]) {
 
     Node node(0, 0);
     Board board;
+    Move* test;
 
     srand(time(0));
 
+    board.makeMove(0,1);
+    board.makeMove(0,2);
+    board.makeMove(1,2);
+    board.makeMove(1,3);
+    board.makeMove(2,1);
+    board.makeMove(2,2);
+    board.makeMove(1,0);
+    board.makeMove(2,3);
+    board.makeMove(0,3);
+
     //test = board.UCTSearch(1000);
     //board.makeMove(test);
-    for(int i = 0; i < 50; i++) {
-        board.makeRandomMove();
-    }
+    //for(int i = 0; i < 50; i++) {
+    //    board.makeRandomMove();
+    //}
     cout << board;
     cout << "OK" << endl;
 }

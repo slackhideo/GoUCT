@@ -149,14 +149,30 @@ void Board::copyStateFrom(const Board* orig) {
 
 /* Plays a move on the board with the coordinates (x,y) */
 void Board::makeMove(int x, int y) {
-	this->b[x][y] = this->player;
-	this->changePlayer();
+	if(isLegalPlay(x,y)) {
+		this->b[x][y] = this->player;
+		this->changePlayer();
+	}
+	// Checks and removes if move captures any stone
+	if(x > 0 && isDead(x-1,y)) removeGroup(x-1,y);
+	if(y < BOARD_SIZE-1 && isDead(x,y+1)) removeGroup(x,y+1);
+	if(x < BOARD_SIZE-1 && isDead(x+1,y)) removeGroup(x+1,y);
+	if(y > 0 && isDead(x,y-1)) removeGroup(x,y-1);
 }
 
 /* Plays a move on the board with Move object */
 void Board::makeMove(const Move* move) {
-	this->b[move->x][move->y] = this->player;
-	this->changePlayer();
+	int x = move->x;
+	int y = move->y;
+	if(isLegalPlay(x,y)) {
+		this->b[x][y] = this->player;
+		this->changePlayer();
+	}
+	// Checks and removes if move captures any stone
+	if(x > 0 && isDead(x-1,y)) removeGroup(x-1,y);
+	if(y < BOARD_SIZE-1 && isDead(x,y+1)) removeGroup(x,y+1);
+	if(x < BOARD_SIZE-1 && isDead(x+1,y)) removeGroup(x+1,y);
+	if(y > 0 && isDead(x,y-1)) removeGroup(x,y-1);
 }
 
 /* Random chooses a position on the board to play. Tries until a legal move
@@ -208,9 +224,54 @@ bool Board::isDead(int x, int y) {
 	 (x < BOARD_SIZE-1 && b[x+1][y] == 0) || (y > 0 && b[x][y-1] == 0)) {
 		return false;
 	}
-		
+	bool north = false;
+	bool east = false;
+	bool south = false;
+	bool west = false;
 
-	return true;
+	int group = b[x][y];
+	/* recursively checks other stones of the same group */
+
+	// marks as already visited
+	b[x][y] *= -1;
+
+	// checks north
+	if(x > 0 && group == b[x-1][y]) {
+		north = isDead(x-1, y);
+	}
+	// checks east
+	if(y < BOARD_SIZE-1 && group == b[x][y+1]) {
+		east = isDead(x, y+1);
+	}
+	// checks south
+	if(x < BOARD_SIZE-1 && group == b[x+1][y]) {
+		south = isDead(x+1, y);
+	}
+	// checks west
+	if(y > 0 && group == b[x][y-1]) {
+		west = isDead(x, y-1);
+	}
+
+	// returns board to original state
+	b[x][y] *= -1;
+
+	return !(north && west && south && east);
+}
+
+void Board::removeGroup(int x, int y) {
+	int group = b[x][y];
+
+	b[x][y] = 0;
+	// if(group == 1) captures2++;
+	// else captures1++;
+	// removes north if from the same group
+	if(x > 0 && b[x-1][y] == group) removeGroup(x-1,y);
+	// removes east if from the same group
+	if(y < BOARD_SIZE-1 && b[x][y+1] == group) removeGroup(x,y+1);
+	// removes south if from the same group
+	if(x < BOARD_SIZE-1 && b[x+1][y] == group) removeGroup(x+1,y);
+	// removes west if from the same group
+	if(y > 0 && b[x][y-1] == group) removeGroup(x,y-1);
 }
 
 std::ostream & operator<<(std::ostream & os, const Board &board) {
