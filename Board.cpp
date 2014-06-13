@@ -209,10 +209,10 @@ bool Board::isDead(int x, int y) {
 	 (x < BOARD_SIZE-1 && b[x+1][y] == 0) || (y > 0 && b[x][y-1] == 0)) {
 		return false;
 	}
-	bool north = false;
-	bool east = false;
-	bool south = false;
-	bool west = false;
+	bool north = true;
+	bool east = true;
+	bool south = true;
+	bool west = true;
 
 	int group = b[x][y];
 	/* recursively checks other stones of the same group */
@@ -223,6 +223,7 @@ bool Board::isDead(int x, int y) {
 	// checks north
 	if(x > 0 && group == b[x-1][y]) {
 		north = isDead(x-1, y);
+		
 	}
 	// checks east
 	if(y < BOARD_SIZE-1 && group == b[x][y+1]) {
@@ -240,7 +241,7 @@ bool Board::isDead(int x, int y) {
 	// returns board to original state
 	b[x][y] *= -1;
 
-	return !(north && west && south && east);
+	return (north && west && south && east);
 }
 
 int Board::removeGroup(int x, int y) {
