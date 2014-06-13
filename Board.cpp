@@ -267,6 +267,40 @@ int Board::removeGroup(int x, int y) {
 	return 1+north+east+south+west;
 }
 
+void Board::influence() {
+	Board clone;
+	Board temp;
+
+	clone.copyStateFrom(this);
+	std::cout << "START" << std::endl;
+	for(int i = 0; i < BOARD_SIZE; i++) {
+		for(int j = 0; j < BOARD_SIZE; j++) {
+			if(clone.b[i][j] != 0) clone.b[i][j] = clone.b[i][j] == 1 ? 50 : -50;
+		}
+	}
+	temp.copyStateFrom(&clone);
+	for(int t = 0; t < 4; t++) {
+		for(int i = 0; i < BOARD_SIZE; i++) {
+			for(int j = 0; j < BOARD_SIZE; j++) {
+				int north = i == 0 ? 0 : clone.b[i-1][j];
+				int east = j == BOARD_SIZE ? 0 : clone.b[i][j+1];
+				int south = i == BOARD_SIZE ? 0 : clone.b[i+1][j];
+				int west = j == 0 ? 0 : clone.b[i][j-1];
+				temp.b[i][j] += north + east + south + west;
+			}
+		}
+		clone.copyStateFrom(&temp);
+	}
+	for(int i = 0; i < BOARD_SIZE; i++) {
+		for(int j = 0; j < BOARD_SIZE; j++) {
+			if(clone.b[i][j] > 0) std::cout << "+ ";
+			else if(clone.b[i][j] < 0) std::cout << "- ";
+			else std::cout << ". ";
+		}
+		std::cout << std::endl;
+	}
+}
+
 std::ostream & operator<<(std::ostream & os, const Board &board) {
 	using namespace std;
 

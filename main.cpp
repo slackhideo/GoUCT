@@ -33,9 +33,10 @@ int main(int argc, char *argv[]) {
     cout << "-------------------" << endl << board;
 */
     board.UCTSearch(1000);
-    for(int i = 0; i < 80; i++) {
+    for(int i = 0; i < 60; i++) {
         board.makeRandomMove();
         cout << "-------------------" << endl << board;
     }
+    board.influence();
     cout << "OK" << endl;
 }

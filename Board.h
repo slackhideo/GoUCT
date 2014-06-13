@@ -36,6 +36,7 @@ class Board {
 		int getWinner();
 		bool isDead(int x, int y);
 		int removeGroup(int x, int y);
+		void influence();
 
 		friend std::ostream & operator<<(std::ostream & os, const Board &board);
 };
