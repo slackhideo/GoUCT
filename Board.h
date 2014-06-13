@@ -4,7 +4,6 @@
 #define __BOARD_H__
 
 #include "Node.h"
-#include "Move.h"
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
@@ -25,13 +24,12 @@ class Board {
 		Node* getBestChild(Node& root);
 		Node* UCTSelect(Node& node);
 		int playSimulation(Node& node);
-		Move* UCTSearch(int time);
+		void UCTSearch(int time);
 		bool createChildren(Node& root);
 		void deleteChildren(Node* root);
 		bool isLegalPlay(int x, int y);
 		void copyStateFrom(const Board* orig);
 		void makeMove(int x, int y);
-		void makeMove(const Move* move);
 		void makeRandomMove();
 		int playRandomGame();
 		bool isFinished();

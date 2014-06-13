@@ -14,7 +14,6 @@ int main(int argc, char *argv[]) {
 
     Node node(0, 0);
     Board board;
-    Move* test;
 
     srand(time(0));
 
@@ -33,9 +32,7 @@ int main(int argc, char *argv[]) {
     board.makeMove(1,0);
     cout << "-------------------" << endl << board;
 
-    test = board.UCTSearch(1000);
-    board.makeMove(test);
-    delete test;
+    board.UCTSearch(1000);
     //for(int i = 0; i < 50; i++) {
     //    board.makeRandomMove();
     //}

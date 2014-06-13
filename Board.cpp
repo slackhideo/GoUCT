@@ -88,7 +88,7 @@ int Board::playSimulation(Node& node) {
 }
 
 /* Makes simulations and plays the best move possible */
-Move* Board::UCTSearch(int time) {
+void Board::UCTSearch(int time) {
 	Node root(-1,-1);
 	createChildren(root);
 
@@ -99,7 +99,7 @@ Move* Board::UCTSearch(int time) {
 	}
 
 	Node* n = getBestChild(root);
-	return new Move(n->getX(), n->getY());
+	makeMove(n->getX(), n->getY());
 }
 
 /* Creates all possible moves from root Node */
@@ -150,21 +150,6 @@ void Board::copyStateFrom(const Board* orig) {
 
 /* Plays a move on the board with the coordinates (x,y) */
 void Board::makeMove(int x, int y) {
-	if(isLegalPlay(x,y)) {
-		this->b[x][y] = this->player;
-		this->changePlayer();
-		// Checks and removes if move captures any stone
-		if(x > 0 && b[x-1][y] == this->player && isDead(x-1,y)) removeGroup(x-1,y);
-		if(y < BOARD_SIZE-1 && b[x][y+1] == this->player && isDead(x,y+1)) removeGroup(x,y+1);
-		if(x < BOARD_SIZE-1 && b[x+1][y] == this->player && isDead(x+1,y)) removeGroup(x+1,y);
-		if(y > 0 && b[x][y-1] == this->player && isDead(x,y-1)) removeGroup(x,y-1);
-	}
-}
-
-/* Plays a move on the board with Move object */
-void Board::makeMove(const Move* move) {
-	int x = move->getX();
-	int y = move->getY();
 	if(isLegalPlay(x,y)) {
 		this->b[x][y] = this->player;
 		this->changePlayer();
