@@ -4,19 +4,28 @@
 #define __NODE_H__
 
 class Node {
-    public:
-        int wins;
-        int visits;
+	private:
+		int wins;
+		int visits;
 
-        int x, y; /* Position of move */
+		int x, y; /* Position of move */
 
-        Node *child;
-        Node *sibling;
+		Node *child;
+		Node *sibling;
 
-        Node(int x, int y);
-        virtual ~Node();
-        void update(int val);
-        double getWinRate();
+	public:
+		Node(int x, int y);
+		virtual ~Node();
+		void update(int val);
+		double getWinRate();
+		int getWins() const;
+		int getVisits() const;
+		int getX() const;
+		int getY() const;
+		Node *getChild() const;
+		void setChild(Node *);
+		Node *getSibling() const;
+		void setSibling(Node *);
 };
 
 #endif /* __NODE_H__ */

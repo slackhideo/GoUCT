@@ -11,13 +11,14 @@
 #define BOARD_SIZE 9
 
 class Board {
-	public:
+	private:
 		int b[BOARD_SIZE][BOARD_SIZE];
 		int player;
 		double moku1;
 		double moku2;
 		Node* root;
 
+	public:
 		Board();
 		virtual ~Board();
 		void changePlayer();

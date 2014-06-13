@@ -23,10 +23,42 @@ void Node::update(int val) {
 }
 
 double Node::getWinRate() {
-    if(this->visits > 0) {
-        return (double)(wins / visits);
+    if(this->getVisits() > 0) {
+        return (double)(this->getWins() / this->getVisits());
     }
     else {
         return 0; /* Should not happen */
     }
+}
+
+int Node::getWins() const {
+	return this->wins;
+}
+
+int Node::getVisits() const {
+	return this->visits;
+}
+
+int Node::getX() const {
+	return this->x;
+}
+
+int Node::getY() const {
+	return this->y;
+}
+
+Node *Node::getChild() const {
+	return this->child;
+}
+
+void Node::setChild(Node *child) {
+	this->child = child;
+}
+
+Node *Node::getSibling() const {
+	return this->sibling;
+}
+
+void Node::setSibling(Node *sibling) {
+	this->sibling = sibling;
 }

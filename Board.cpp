@@ -24,15 +24,15 @@ void Board::changePlayer() {
 
 /* Select the child from a Node with the most number of simulations */
 Node* Board::getBestChild(Node& root) {
-	Node* child = root.child;
+	Node* child = root.getChild();
 	Node* best_child = NULL;
 	int best_visits = -1;
 	while(child != NULL) {
-		if(child->visits > best_visits) {
+		if(child->getVisits() > best_visits) {
 			best_child = child;
-			best_visits = child->visits;
+			best_visits = child->getVisits();
 		}
-		child = child->sibling;
+		child = child->getSibling();
 	}
 
 	return best_child;
@@ -41,14 +41,14 @@ Node* Board::getBestChild(Node& root) {
 /* Select the best child from a Node based on UCT value */
 Node* Board::UCTSelect(Node& node) {
 	Node* res = NULL;
-	Node* next = node.child;
+	Node* next = node.getChild();
 	double best_uct = 0;
 
 	while(next != NULL) {
 		double uctvalue;
-		if(next->visits > 0) {
+		if(next->getVisits() > 0) {
 			double winrate = next->getWinRate();
-			double uct = 0.44 * sqrt(log(node.visits) / next->visits);
+			double uct = 0.44 * sqrt(log(node.getVisits()) / next->getVisits());
 			uctvalue = winrate + uct;
 		}
 		else {
@@ -60,7 +60,7 @@ Node* Board::UCTSelect(Node& node) {
 			res = next;
 		}
 
-		next = next->sibling;
+		next = next->getSibling();
 	}
 
 	return res;
@@ -70,15 +70,15 @@ Node* Board::UCTSelect(Node& node) {
  * games on the tree nodes */
 int Board::playSimulation(Node& node) {
 	int randomresult = 0;
-	if(node.child == NULL && node.visits < 10) {
+	if(node.getChild() == NULL && node.getVisits() < 10) {
 		randomresult = playRandomGame();
 	}
 	else {
-		if(node.child == NULL) createChildren(node);
+		if(node.getChild() == NULL) createChildren(node);
 
 		Node* next = UCTSelect(node);
-		makeMove(next->x, next->y);
-		
+		makeMove(next->getX(), next->getY());
+
 		int res = playSimulation(*next);
 		randomresult = 1-res;
 	}
@@ -99,7 +99,7 @@ Move* Board::UCTSearch(int time) {
 	}
 
 	Node* n = getBestChild(root);
-	return new Move(n->x, n->y);
+	return new Move(n->getX(), n->getY());
 }
 
 /* Creates all possible moves from root Node */
@@ -111,12 +111,12 @@ bool Board::createChildren(Node& root) {
 			if(this->b[i][j] == 0 && isLegalPlay(i, j)) {
 				ret = true;
 				if(last == NULL) {
-					root.child = new Node(i,j);
-					last = root.child;
+					root.setChild(new Node(i,j));
+					last = root.getChild();
 				}
 				else {
-					last->sibling = new Node(i,j);
-					last = last->sibling;
+					last->setSibling(new Node(i,j));
+					last = last->getSibling();
 				}
 			}
 		}
@@ -163,8 +163,8 @@ void Board::makeMove(int x, int y) {
 
 /* Plays a move on the board with Move object */
 void Board::makeMove(const Move* move) {
-	int x = move->x;
-	int y = move->y;
+	int x = move->getX();
+	int y = move->getY();
 	if(isLegalPlay(x,y)) {
 		this->b[x][y] = this->player;
 		this->changePlayer();
