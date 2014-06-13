@@ -127,15 +127,21 @@ bool Board::createChildren(Node& root) {
 
 /* Checks if the move is legal */
 bool Board::isLegalPlay(int x, int y) {
-	bool result = false;
+	bool suicide;
+	bool kills = false;
 
-	if(this->b[x][y] != 0) return result;
+	if(this->b[x][y] != 0) return false;
 
 	// Check if suicide play
 	this->b[x][y] = this->player;
-	result = isDead(x, y);
+	suicide = isDead(x, y);
+	// Check if kills any opponent stones
+	kills = ((x == 0 && this->player == b[x-1][y] ? false : isDead(x-1,y))
+		|| (y == BOARD_SIZE-1 && this->player == b[x][y+1] ? false : isDead(x,y+1))
+		|| (x == BOARD_SIZE-1 && this->player == b[x+1][y] ? false : isDead(x+1,y))
+		|| (y == 0 && this->player == b[x][y-1] ? false : isDead(x,y-1)));
 	this->b[x][y] = 0;
-	return !result;
+	return ((!suicide) || kills);
 }
 
 /* Copies the board state */
@@ -283,8 +289,8 @@ void Board::influence() {
 		for(int i = 0; i < BOARD_SIZE; i++) {
 			for(int j = 0; j < BOARD_SIZE; j++) {
 				int north = i == 0 ? 0 : clone.b[i-1][j];
-				int east = j == BOARD_SIZE ? 0 : clone.b[i][j+1];
-				int south = i == BOARD_SIZE ? 0 : clone.b[i+1][j];
+				int east = j == BOARD_SIZE-1 ? 0 : clone.b[i][j+1];
+				int south = i == BOARD_SIZE-1 ? 0 : clone.b[i+1][j];
 				int west = j == 0 ? 0 : clone.b[i][j-1];
 				temp.b[i][j] += north + east + south + west;
 			}
@@ -293,8 +299,8 @@ void Board::influence() {
 	}
 	for(int i = 0; i < BOARD_SIZE; i++) {
 		for(int j = 0; j < BOARD_SIZE; j++) {
-			if(clone.b[i][j] > 0) std::cout << "+ ";
-			else if(clone.b[i][j] < 0) std::cout << "- ";
+			if(clone.b[i][j] > 1000) std::cout << "+ ";
+			else if(clone.b[i][j] < -1000) std::cout << "- ";
 			else std::cout << ". ";
 		}
 		std::cout << std::endl;
