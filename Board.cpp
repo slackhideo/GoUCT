@@ -14,6 +14,7 @@ Board::Board() {
 	this->movements = 0;
 	this->moku1 = 0;
 	this->moku2 = 6.5;
+	this->ko = false;
 }
 
 Board::~Board() {
@@ -33,6 +34,10 @@ Node* Board::getBestChild(Node& root) {
 	int best_wins = -1;
 	while(child != NULL) {
 		if(child->getVisits() >= best_visits && child->getWins() > best_wins) {
+			best_child = child;
+			best_visits = child->getVisits();
+			best_wins = child->getWins();
+		} else if(child->getVisits() == best_visits && child->getWins() == best_wins && rand()%2 == 0) {
 			best_child = child;
 			best_visits = child->getVisits();
 			best_wins = child->getWins();
@@ -61,6 +66,9 @@ Node* Board::UCTSelect(Node& node) {
 		}
 
 		if(uctvalue > best_uct) {
+			best_uct = uctvalue;
+			res = next;
+		} else if(uctvalue == best_uct && rand()%2 == 0) {
 			best_uct = uctvalue;
 			res = next;
 		}
@@ -119,7 +127,7 @@ bool Board::createChildren(Node& root) {
 	bool ret = false;
 	for(int i = 0; i < BOARD_SIZE; i++) {
 		for(int j = 0; j < BOARD_SIZE; j++) {
-			if(this->b[i][j] == 0 && isLegalPlay(i, j)) {
+			if(isLegalPlay(i, j)) {
 				ret = true;
 				if(last == NULL) {
 					root.setChild(new Node(i,j));
@@ -141,8 +149,10 @@ bool Board::isLegalPlay(int x, int y) {
 	bool suicide;
 	bool kills = false;
 
+	// Check if there is a stone already
 	if(this->b[x][y] != 0) return false;
-
+	// Check if ko
+	if(this->ko && this->koX == x && this->koY == y) return false;
 	// Check if suicide play
 	this->b[x][y] = this->player;
 	suicide = isDead(x, y);
@@ -172,31 +182,52 @@ void Board::copyStateFrom(const Board* orig) {
 /* Plays a move on the board with the coordinates (x,y) */
 void Board::makeMove(int x, int y) {
 	if(isLegalPlay(x,y)) {
-		int captures;
+		int captures = 0;
+		this->ko = false;
 		this->b[x][y] = this->player;
 		this->changePlayer();
 		// Checks and removes if move captures any stone
 		// Checks north
 		if(x > 0 && b[x-1][y] == this->player && isDead(x-1,y)) {
 			captures = removeGroup(x-1,y);
+			if(captures == 1) {
+				this->ko = true;
+				this->koX = x-1;
+				this->koY = y;
+			}
 			if(this->player == 1) moku2 += captures;
 			else moku1 += captures;
 		}
 		// Checks east
 		if(y < BOARD_SIZE-1 && b[x][y+1] == this->player && isDead(x,y+1)) {
 			captures = removeGroup(x,y+1);
+			if(captures == 1) {
+				this->ko = true;
+				this->koX = x-1;
+				this->koY = y;
+			}
 			if(this->player == 1) moku2 += captures;
 			else moku1 += captures;
 		}
 		// Checks south
 		if(x < BOARD_SIZE-1 && b[x+1][y] == this->player && isDead(x+1,y)) {
 			captures = removeGroup(x+1,y);
+			if(captures == 1) {
+				this->ko = true;
+				this->koX = x-1;
+				this->koY = y;
+			}
 			if(this->player == 1) moku2 += captures;
 			else moku1 += captures;
 		}
 		// Checks west
 		if(y > 0 && b[x][y-1] == this->player && isDead(x,y-1)) {
 			captures = removeGroup(x,y-1);
+			if(captures == 1) {
+				this->ko = true;
+				this->koX = x-1;
+				this->koY = y;
+			}
 			if(this->player == 1) moku2 += captures;
 			else moku1 += captures;
 		}
@@ -412,12 +443,13 @@ int Board::removeGroup(int x, int y) {
 }
 
 /* Calculates board influence using Zorobris algorithm */
-void Board::influence() {
+int Board::influence() {
 	Board clone;
 	Board temp;
+	int winner = 0;
 
 	clone.copyStateFrom(this);
-	std::cout << "START" << std::endl;
+	//std::cout << "START" << std::endl;
 	for(int i = 0; i < BOARD_SIZE; i++) {
 		for(int j = 0; j < BOARD_SIZE; j++) {
 			if(clone.b[i][j] != 0) clone.b[i][j] = clone.b[i][j] == 1 ? 50 : -50;
@@ -436,14 +468,19 @@ void Board::influence() {
 		}
 		clone.copyStateFrom(&temp);
 	}
+	
 	for(int i = 0; i < BOARD_SIZE; i++) {
 		for(int j = 0; j < BOARD_SIZE; j++) {
-			if(clone.b[i][j] > 1000) std::cout << "+ ";
-			else if(clone.b[i][j] < -1000) std::cout << "- ";
-			else std::cout << ". ";
+			if(clone.b[i][j] > 500) winner++;//std::cout << "+ ";
+			else if(clone.b[i][j] < -500) winner--;//std::cout << "- ";
+			//else std::cout << ". ";
 		}
-		std::cout << std::endl;
+		//std::cout << std::endl;
 	}
+	winner += (int)this->moku1%1;
+	winner -= (int)this->moku2%1;
+
+	return winner == 0 ? 0 : (winner > 0 ? 1 : 2);
 }
 
 std::ostream & operator<<(std::ostream & os, const Board &board) {

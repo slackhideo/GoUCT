@@ -17,6 +17,9 @@ class Board {
 		int movements;
 		double moku1;
 		double moku2;
+		bool ko;
+		int koX;
+		int koY;
 		Node* root;
 
 	public:
@@ -40,7 +43,7 @@ class Board {
 		void updateStones(int value, int& p1stones, int& p2stones);
 		bool isDead(int x, int y);
 		int removeGroup(int x, int y);
-		void influence();
+		int influence();
 
 		friend std::ostream & operator<<(std::ostream & os, const Board &board);
 };
