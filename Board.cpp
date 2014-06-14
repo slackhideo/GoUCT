@@ -30,10 +30,12 @@ Node* Board::getBestChild(Node& root) {
 	Node* child = root.getChild();
 	Node* best_child = NULL;
 	int best_visits = -1;
+	int best_wins = -1;
 	while(child != NULL) {
-		if(child->getVisits() > best_visits) {
+		if(child->getVisits() >= best_visits && child->getWins() > best_wins) {
 			best_child = child;
 			best_visits = child->getVisits();
+			best_wins = child->getWins();
 		}
 		child = child->getSibling();
 	}
