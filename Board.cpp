@@ -11,6 +11,9 @@ Board::Board() {
 			this->b[i][j] = 0;
 		}
 	}
+	this->movements = 0;
+	this->moku1 = 0;
+	this->moku2 = 6.5;
 }
 
 Board::~Board() {
@@ -97,6 +100,12 @@ void Board::UCTSearch(int time) {
 		clone.copyStateFrom(this);
 		clone.playSimulation(root);
 	}
+	/*
+	Node* test = root.getChild();
+	while(test != NULL) {
+		std::cout << test->getWins() << " " << test->getVisits() << std::endl;
+		test = test->getSibling();
+	}*/
 
 	Node* n = getBestChild(root);
 	makeMove(n->getX(), n->getY());
@@ -153,18 +162,43 @@ void Board::copyStateFrom(const Board* orig) {
 		}
 	}
 	this->player = orig->player;
+	this->moku1 = orig->moku1;
+	this->moku2 = orig->moku2;
+	this->movements = orig->movements;
 }
 
 /* Plays a move on the board with the coordinates (x,y) */
 void Board::makeMove(int x, int y) {
 	if(isLegalPlay(x,y)) {
+		int captures;
 		this->b[x][y] = this->player;
 		this->changePlayer();
 		// Checks and removes if move captures any stone
-		if(x > 0 && b[x-1][y] == this->player && isDead(x-1,y)) removeGroup(x-1,y);
-		if(y < BOARD_SIZE-1 && b[x][y+1] == this->player && isDead(x,y+1)) removeGroup(x,y+1);
-		if(x < BOARD_SIZE-1 && b[x+1][y] == this->player && isDead(x+1,y)) removeGroup(x+1,y);
-		if(y > 0 && b[x][y-1] == this->player && isDead(x,y-1)) removeGroup(x,y-1);
+		// Checks north
+		if(x > 0 && b[x-1][y] == this->player && isDead(x-1,y)) {
+			captures = removeGroup(x-1,y);
+			if(this->player == 1) moku2 += captures;
+			else moku1 += captures;
+		}
+		// Checks east
+		if(y < BOARD_SIZE-1 && b[x][y+1] == this->player && isDead(x,y+1)) {
+			captures = removeGroup(x,y+1);
+			if(this->player == 1) moku2 += captures;
+			else moku1 += captures;
+		}
+		// Checks south
+		if(x < BOARD_SIZE-1 && b[x+1][y] == this->player && isDead(x+1,y)) {
+			captures = removeGroup(x+1,y);
+			if(this->player == 1) moku2 += captures;
+			else moku1 += captures;
+		}
+		// Checks west
+		if(y > 0 && b[x][y-1] == this->player && isDead(x,y-1)) {
+			captures = removeGroup(x,y-1);
+			if(this->player == 1) moku2 += captures;
+			else moku1 += captures;
+		}
+		this->movements++;
 	}
 }
 
@@ -200,7 +234,8 @@ int Board::playRandomGame() {
 /* Checks the board state and returns if the game is finished */
 // TODO
 bool Board::isFinished() {
-	return true;
+	if(this->movements > 65) return true;
+	return false;
 }
 
 /* Checks the endgame board state and returns the winner of the game */
@@ -236,9 +271,8 @@ int Board::getWinner() {
 			}
 		}
 	}
-	std::cout << "P1 pts: " << p1pts << std::endl;
-	std::cout << "P2 pts: " << p2pts << std::endl;
-
+//	std::cout << "P1 pts: " << p1pts << std::endl;
+//	std::cout << "P2 pts: " << p2pts << std::endl;
 	/* Player 1 wins */
 	if(p1pts > p2pts) {
 		return 1;
@@ -375,6 +409,7 @@ int Board::removeGroup(int x, int y) {
 	return 1+north+east+south+west;
 }
 
+/* Calculates board influence using Zorobris algorithm */
 void Board::influence() {
 	Board clone;
 	Board temp;
@@ -428,5 +463,7 @@ std::ostream & operator<<(std::ostream & os, const Board &board) {
 		}
 		os << endl;
 	}
+	os << "Captures1: " << board.moku1 << endl;
+	os << "Captures2: " << board.moku2 << endl;
 	return os;
 }

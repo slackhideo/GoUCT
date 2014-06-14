@@ -15,7 +15,8 @@ int main(int argc, char *argv[]) {
     Board board;
 
     srand(time(0));
-
+    int x = 0;
+    int y = 0;
 /*
     board.makeMove(6,8);
     cout << "-------------------" << endl << board;
@@ -54,14 +55,22 @@ int main(int argc, char *argv[]) {
     cout << "-------------------" << endl << board;
     board.makeMove(8,5);
     cout << "-------------------" << endl << board;
-
-//   board.UCTSearch(1000);
 */
-    for(int i = 0; i < 80; i++) {
+    while(x < 30) {
+	x++;
+        board.UCTSearch(20000);
+        cout << board << "------------------" << endl;
+        //cin >> x;
+	//cin >> y;
+        board.UCTSearch(20000);
+        cout << board << "------------------" << endl;
+    }
+/*
+    for(int i = 0; i < 60; i++) {
         board.makeRandomMove();
         cout << "-------------------" << endl << board;
     }
-
+*/
     board.influence();
     cout << "OK" << endl;
 	cout << "And the winner is... player " << board.getWinner() << endl;

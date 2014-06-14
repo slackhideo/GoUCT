@@ -14,6 +14,7 @@ class Board {
 	private:
 		int b[BOARD_SIZE][BOARD_SIZE];
 		int player;
+		int movements;
 		double moku1;
 		double moku2;
 		Node* root;
