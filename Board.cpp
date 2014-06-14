@@ -136,10 +136,11 @@ bool Board::isLegalPlay(int x, int y) {
 	this->b[x][y] = this->player;
 	suicide = isDead(x, y);
 	// Check if kills any opponent stones
-	kills = ((x == 0 && this->player == b[x-1][y] ? false : isDead(x-1,y))
-		|| (y == BOARD_SIZE-1 && this->player == b[x][y+1] ? false : isDead(x,y+1))
-		|| (x == BOARD_SIZE-1 && this->player == b[x+1][y] ? false : isDead(x+1,y))
-		|| (y == 0 && this->player == b[x][y-1] ? false : isDead(x,y-1)));
+	kills = ((x == 0 || this->player != 3-b[x-1][y] ? false : isDead(x-1,y))
+		|| (y == BOARD_SIZE-1 || this->player != 3-b[x][y+1] ? false : isDead(x,y+1))
+		|| (x == BOARD_SIZE-1 || this->player != 3-b[x+1][y] ? false : isDead(x+1,y))
+		|| (y == 0 || this->player != 3-b[x][y-1] ? false : isDead(x,y-1)));
+
 	this->b[x][y] = 0;
 	return ((!suicide) || kills);
 }

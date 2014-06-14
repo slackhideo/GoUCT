@@ -17,26 +17,27 @@ int main(int argc, char *argv[]) {
     srand(time(0));
 
 /*
+    board.makeMove(6,8);
+    cout << "-------------------" << endl << board;
+    board.makeMove(0,0);
+    cout << "-------------------" << endl << board;
+    board.makeMove(7,8);
+    cout << "-------------------" << endl << board;
+    board.makeMove(0,1);
+    cout << "-------------------" << endl << board;
+    board.makeMove(7,7);
+    cout << "-------------------" << endl << board;
+    board.makeMove(0,2);
+    cout << "-------------------" << endl << board;
+    board.makeMove(8,7);
+    cout << "-------------------" << endl << board;
     board.makeMove(0,3);
     cout << "-------------------" << endl << board;
-    board.makeMove(0,5);
+    board.makeMove(8,6);
     cout << "-------------------" << endl << board;
-    board.makeMove(1,3);
+    board.makeMove(8,8);
     cout << "-------------------" << endl << board;
-    board.makeMove(1,5);
-    cout << "-------------------" << endl << board;
-    board.makeMove(2,3);
-    cout << "-------------------" << endl << board;
-    board.makeMove(2,5);
-    cout << "-------------------" << endl << board;
-    board.makeMove(3,3);
-    cout << "-------------------" << endl << board;
-    board.makeMove(3,5);
-    cout << "-------------------" << endl << board;
-    board.makeMove(4,3);
-    cout << "-------------------" << endl << board;
-    board.makeMove(4,5);
-    cout << "-------------------" << endl << board;
+
     board.makeMove(5,3);
     cout << "-------------------" << endl << board;
     board.makeMove(5,5);
@@ -53,13 +54,14 @@ int main(int argc, char *argv[]) {
     cout << "-------------------" << endl << board;
     board.makeMove(8,5);
     cout << "-------------------" << endl << board;
-*/
-//   board.UCTSearch(1000);
 
+//   board.UCTSearch(1000);
+*/
     for(int i = 0; i < 80; i++) {
         board.makeRandomMove();
         cout << "-------------------" << endl << board;
     }
+
     board.influence();
     cout << "OK" << endl;
 }
