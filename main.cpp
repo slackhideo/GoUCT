@@ -64,4 +64,5 @@ int main(int argc, char *argv[]) {
 
     board.influence();
     cout << "OK" << endl;
+	cout << "And the winner is... player " << board.getWinner() << endl;
 }

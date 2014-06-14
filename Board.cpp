@@ -204,9 +204,110 @@ bool Board::isFinished() {
 }
 
 /* Checks the endgame board state and returns the winner of the game */
-// TODO
 int Board::getWinner() {
-	return 1;
+	Board clone;
+	int p1pts = 0, p2pts = 0;
+	int value;
+
+	clone.copyStateFrom(this);
+
+	/* Extends players territories with their stones */
+	for(int k = 0; k < TERR_ITER_NUMBER; k++) {
+		for(int i = 0; i < BOARD_SIZE; i++) {
+			for(int j = 0; j < BOARD_SIZE; j++) {
+				if(this->b[i][j] == 0) {
+					clone.b[i][j] = this->own(i, j);
+				}
+			}
+		}
+	}
+
+	/* Counts each player's stones */
+	for(int i = 0; i < BOARD_SIZE; i++) {
+		for(int j = 0; j < BOARD_SIZE; j++) {
+			value = clone.own(i, j);
+			switch(value) {
+				case 1:
+					p1pts++;
+					break;
+				case 2:
+					p2pts++;
+					break;
+			}
+		}
+	}
+	std::cout << "P1 pts: " << p1pts << std::endl;
+	std::cout << "P2 pts: " << p2pts << std::endl;
+
+	/* Player 1 wins */
+	if(p1pts > p2pts) {
+		return 1;
+	}
+
+	/* Player 2 wins */
+	else if(p1pts < p2pts) {
+		return 2;
+	}
+
+	/* Draw */
+	else {
+		return 0;
+	}
+}
+
+/* Verifies and returns which player owns (approximately) a board position */
+int Board::own(int x, int y) {
+	/* Trivial case: there is a player's stone */
+	if(this->b[x][y] == 1) {
+		return 1;
+	}
+	else if(this->b[x][y] == 2) {
+		return 2;
+	}
+
+	/* Case where there is no stone: verify adjacent positions */
+	else {
+		int p1stones = 0, p2stones = 0;
+		int value;
+		if(x > 0) {
+			value = this->b[x-1][y];
+			this->updateStones(value, p1stones, p2stones);
+		}
+		if(y < BOARD_SIZE-1) {
+			value = this->b[x][y+1];
+			this->updateStones(value, p1stones, p2stones);
+		}
+		if(x < BOARD_SIZE-1) {
+			value = this->b[x+1][y];
+			this->updateStones(value, p1stones, p2stones);
+		}
+		if(y > 0) {
+			value = this->b[x][y-1];
+			this->updateStones(value, p1stones, p2stones);
+		}
+
+		if(p1stones > p2stones) {
+			return 1;
+		}
+		else if(p1stones < p2stones) {
+			return 2;
+		}
+		else {
+			return 0;
+		}
+	}
+}
+
+/* Updates the number of stones around a board position */
+void Board::updateStones(int value, int& p1stones, int& p2stones) {
+	switch(value) {
+		case 1:
+			p1stones++;
+			break;
+		case 2:
+			p2stones++;
+			break;
+	}
 }
 
 /* Checks if a group of pieces is dead */

@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cmath>
 #define BOARD_SIZE 9
+#define TERR_ITER_NUMBER 2
 
 class Board {
 	private:
@@ -34,6 +35,8 @@ class Board {
 		int playRandomGame();
 		bool isFinished();
 		int getWinner();
+		int own(int x, int y);
+		void updateStones(int value, int& p1stones, int& p2stones);
 		bool isDead(int x, int y);
 		int removeGroup(int x, int y);
 		void influence();
