@@ -37,7 +37,8 @@ Node* Board::getBestChild(Node& root) {
 			best_child = child;
 			best_visits = child->getVisits();
 			best_wins = child->getWins();
-		} else if(child->getVisits() == best_visits && child->getWins() == best_wins && rand()%2 == 0) {
+		} else if(child->getVisits() == best_visits &&
+				child->getWins() == best_wins && rand()%2 == 0) {
 			best_child = child;
 			best_visits = child->getVisits();
 			best_wins = child->getWins();
@@ -285,8 +286,8 @@ int Board::getWinner() {
 	for(int k = 0; k < TERR_ITER_NUMBER; k++) {
 		for(int i = 0; i < BOARD_SIZE; i++) {
 			for(int j = 0; j < BOARD_SIZE; j++) {
-				if(this->b[i][j] == 0) {
-					clone.b[i][j] = this->own(i, j);
+				if(clone.b[i][j] == 0) {
+					clone.b[i][j] = clone.own(i, j);
 				}
 			}
 		}
@@ -306,8 +307,7 @@ int Board::getWinner() {
 			}
 		}
 	}
-//	std::cout << "P1 pts: " << p1pts << std::endl;
-//	std::cout << "P2 pts: " << p2pts << std::endl;
+
 	/* Player 1 wins */
 	if(p1pts > p2pts) {
 		return 1;

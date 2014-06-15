@@ -16,8 +16,8 @@ int main(int argc, char *argv[]) {
 
     srand(time(0));
     int moves = 0;
-    int x = 0;
-    int y = 0;
+/*    int x = 0;
+    int y = 0;*/
 /*
     board.makeMove(6,8);
     cout << "-------------------" << endl << board;
