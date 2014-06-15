@@ -51,7 +51,6 @@ Node* Board::getBestChild(Node& root) {
 	if(child == best_child) root.setChild(NULL);
 	else {
 		while(child->getSibling() != best_child) child = child->getSibling();
-		if(child->getSibling() == best_child) std::cout << "(" << child->getX() << "," << child->getY() << ")" << std::endl;
 		child->setSibling(NULL);
 	}
 	return best_child;
@@ -132,6 +131,7 @@ void Board::UCTSearch(int time) {
 	delete(todelete);
 	delete(this->root->getSibling());
 	this->root->setSibling(NULL);
+	std::cout << "(" << n->getX() << "," << n->getY() << ")" << std::endl;
 	makeMove(n->getX(), n->getY());
 }
 
@@ -250,6 +250,67 @@ void Board::makeRandomMove() {
 	}
 
 	this->makeMove(x, y);
+}
+
+bool Board::makePlayerMove(int x, int y) {
+	if(isLegalPlay(x,y)) {
+		int captures = 0;
+		this->ko = false;
+		this->b[x][y] = this->player;
+		this->changePlayer();
+		// Checks and removes if move captures any stone
+		// Checks north
+		if(x > 0 && b[x-1][y] == this->player && isDead(x-1,y)) {
+			captures += removeGroup(x-1,y);
+		}
+		// Checks east
+		if(y < BOARD_SIZE-1 && b[x][y+1] == this->player && isDead(x,y+1)) {
+			captures += removeGroup(x,y+1);
+		}
+		// Checks south
+		if(x < BOARD_SIZE-1 && b[x+1][y] == this->player && isDead(x+1,y)) {
+			captures += removeGroup(x+1,y);
+		}
+		// Checks west
+		if(y > 0 && b[x][y-1] == this->player && isDead(x,y-1)) {
+			captures += removeGroup(x,y-1);
+		}
+		if(captures == 1) {
+			this->ko = true;
+			this->koX = x;
+			this->koY = y;
+		}
+		if(this->player == 1) moku2 += captures;
+		else moku1 += captures;
+		this->movements++;
+	
+		Node* move = this->root->getChild();
+		if(move->getX() == x && move->getY() == y) {
+			this->root->setChild(NULL);
+			Node* todelete = this->root;
+			this->root = move;
+			delete(todelete);
+			delete(this->root->getSibling());
+			this->root->setSibling(NULL);
+			
+		}
+		else {
+			Node* sibling = move->getSibling();
+			while(sibling->getX() != x || sibling->getY() != y) {
+				move = move->getSibling();
+				sibling = sibling->getSibling();
+			}
+			move->setSibling(NULL);
+			Node* todelete = this->root;
+			this->root = sibling;
+			delete(todelete);
+			delete(this->root->getSibling());
+			this->root->setSibling(NULL);
+		}
+	
+		return true;
+	}
+	return false;
 }
 
 /* Plays random moves until endgame and returns the winner */
@@ -451,7 +512,6 @@ int Board::influence() {
 	int winner = 0;
 
 	clone.copyStateFrom(this);
-	//std::cout << "START" << std::endl;
 	for(int i = 0; i < BOARD_SIZE; i++) {
 		for(int j = 0; j < BOARD_SIZE; j++) {
 			if(clone.b[i][j] != 0) clone.b[i][j] = clone.b[i][j] == 1 ? 50 : -50;
@@ -473,11 +533,9 @@ int Board::influence() {
 	
 	for(int i = 0; i < BOARD_SIZE; i++) {
 		for(int j = 0; j < BOARD_SIZE; j++) {
-			if(clone.b[i][j] > 500) winner++;//std::cout << "+ ";
-			else if(clone.b[i][j] < -500) winner--;//std::cout << "- ";
-			//else std::cout << ". ";
+			if(clone.b[i][j] > 500) winner++;
+			else if(clone.b[i][j] < -500) winner--;
 		}
-		//std::cout << std::endl;
 	}
 	winner += (int)this->moku1%1;
 	winner -= (int)this->moku2%1;

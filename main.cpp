@@ -16,8 +16,8 @@ int main(int argc, char *argv[]) {
 
     srand(time(0));
     int moves = 0;
-/*    int x = 0;
-    int y = 0;*/
+    int x = 0;
+    int y = 0;
 /*
     board.makeMove(6,8);
     cout << "-------------------" << endl << board;
@@ -61,10 +61,15 @@ int main(int argc, char *argv[]) {
 	moves++;
         board.UCTSearch(10000);
         cout << board << "------------------" << endl;
-        //cin >> x;
-	//cin >> y;
-	//board.makeMove(x,y);
-        board.UCTSearch(50000);
+        cin >> x;
+	cin >> y;
+	while(!board.makePlayerMove(x,y)) {
+		cout << "Illegal play!" << endl << "Try a different move" << endl;
+		cin >> x;
+		cin >> y;
+
+	}
+        //board.UCTSearch(50000);
         //board.makeRandomMove();
         cout << board << "------------------" << endl;
     }

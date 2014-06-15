@@ -37,6 +37,7 @@ class Board {
 		void makeMove(int x, int y);
 		void makeRandomMove();
 		int playRandomGame();
+		bool makePlayerMove(int x, int y);
 		bool isFinished();
 		int getWinner();
 		int own(int x, int y);
