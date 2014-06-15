@@ -45,6 +45,14 @@ Node* Board::getBestChild(Node& root) {
 		child = child->getSibling();
 	}
 
+	// Unattach previous best sibling for memory free
+	child = root.getChild();
+	if(child == best_child) root.setChild(NULL);
+	else {
+		while(child->getSibling() != best_child) child = child->getSibling();
+		if(child->getSibling() == best_child) std::cout << "(" << child->getX() << "," << child->getY() << ")" << std::endl;
+		child->setSibling(NULL);
+	}
 	return best_child;
 }
 
@@ -102,13 +110,13 @@ int Board::playSimulation(Node& node) {
 
 /* Makes simulations and plays the best move possible */
 void Board::UCTSearch(int time) {
-	Node root(-1,-1);
-	createChildren(root);
+	if(this->root->getChild() == NULL)
+		createChildren(*this->root);
 
 	Board clone;
 	for(int i = 0; i < time; i++) {
 		clone.copyStateFrom(this);
-		clone.playSimulation(root);
+		clone.playSimulation(*this->root);
 	}
 	/*
 	Node* test = root.getChild();
@@ -117,7 +125,12 @@ void Board::UCTSearch(int time) {
 		test = test->getSibling();
 	}*/
 
-	Node* n = getBestChild(root);
+	Node* n = getBestChild(*this->root);
+	Node* todelete = this->root;
+	this->root = n;
+	delete(todelete);
+	delete(this->root->getSibling());
+	this->root->setSibling(NULL);
 	makeMove(n->getX(), n->getY());
 }
 
@@ -250,7 +263,7 @@ int Board::playRandomGame() {
 		this->makeRandomMove();
 	}
 
-	return getWinner() == cur_player ? 1 : 0;
+	return influence() == cur_player ? 1 : 0;
 }
 
 /* Checks the board state and returns if the game is finished */
