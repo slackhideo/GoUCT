@@ -151,10 +151,17 @@ bool Board::isLegalPlay(int x, int y) {
 
 	// Check if there is a stone already
 	if(this->b[x][y] != 0) return false;
-	// Check if ko
-	if(this->ko && this->koX == x && this->koY == y) return false;
-	// Check if suicide play
+	// Check if suicide play and ko
 	this->b[x][y] = this->player;
+	if(this->ko == true) {
+		if((koX == 0 || b[koX-1][koY] == this->player)
+		 && (koY == BOARD_SIZE-1 || b[koX][koY+1] == this->player)
+		 && (koX == BOARD_SIZE-1 || b[koX+1][koY] == this->player)
+		 && (koY == 0 || b[koX][koY-1] == this->player)) {
+			this->b[x][y] = 0;
+			return false;
+		}
+	}
 	suicide = isDead(x, y);
 	// Check if kills any opponent stones
 	kills = ((x == 0 || this->player != 3-b[x-1][y] ? false : isDead(x-1,y))
@@ -177,6 +184,9 @@ void Board::copyStateFrom(const Board* orig) {
 	this->moku1 = orig->moku1;
 	this->moku2 = orig->moku2;
 	this->movements = orig->movements;
+	this->ko = orig->ko;
+	this->koX = orig->koX;
+	this->koY = orig->koY;
 }
 
 /* Plays a move on the board with the coordinates (x,y) */
@@ -189,48 +199,27 @@ void Board::makeMove(int x, int y) {
 		// Checks and removes if move captures any stone
 		// Checks north
 		if(x > 0 && b[x-1][y] == this->player && isDead(x-1,y)) {
-			captures = removeGroup(x-1,y);
-			if(captures == 1) {
-				this->ko = true;
-				this->koX = x-1;
-				this->koY = y;
-			}
-			if(this->player == 1) moku2 += captures;
-			else moku1 += captures;
+			captures += removeGroup(x-1,y);
 		}
 		// Checks east
 		if(y < BOARD_SIZE-1 && b[x][y+1] == this->player && isDead(x,y+1)) {
-			captures = removeGroup(x,y+1);
-			if(captures == 1) {
-				this->ko = true;
-				this->koX = x-1;
-				this->koY = y;
-			}
-			if(this->player == 1) moku2 += captures;
-			else moku1 += captures;
+			captures += removeGroup(x,y+1);
 		}
 		// Checks south
 		if(x < BOARD_SIZE-1 && b[x+1][y] == this->player && isDead(x+1,y)) {
-			captures = removeGroup(x+1,y);
-			if(captures == 1) {
-				this->ko = true;
-				this->koX = x-1;
-				this->koY = y;
-			}
-			if(this->player == 1) moku2 += captures;
-			else moku1 += captures;
+			captures += removeGroup(x+1,y);
 		}
 		// Checks west
 		if(y > 0 && b[x][y-1] == this->player && isDead(x,y-1)) {
-			captures = removeGroup(x,y-1);
-			if(captures == 1) {
-				this->ko = true;
-				this->koX = x-1;
-				this->koY = y;
-			}
-			if(this->player == 1) moku2 += captures;
-			else moku1 += captures;
+			captures += removeGroup(x,y-1);
 		}
+		if(captures == 1) {
+			this->ko = true;
+			this->koX = x;
+			this->koY = y;
+		}
+		if(this->player == 1) moku2 += captures;
+		else moku1 += captures;
 		this->movements++;
 	}
 }
@@ -238,7 +227,7 @@ void Board::makeMove(int x, int y) {
 /* Random chooses a position on the board to play. Tries until a legal move
  * is found */
 void Board::makeRandomMove() {
-	
+
 	int x = rand()%BOARD_SIZE;
 	int y = rand()%BOARD_SIZE;
 	while(!isLegalPlay(x, y)) {
@@ -486,7 +475,11 @@ int Board::influence() {
 std::ostream & operator<<(std::ostream & os, const Board &board) {
 	using namespace std;
 
+	os << "  ";
+	for(int i = 0; i < BOARD_SIZE; i++) os << i << " ";
+	os << endl;
 	for(int i = 0; i < BOARD_SIZE; i++) {
+		os << i << " ";
 		for(int j = 0; j < BOARD_SIZE; j++) {
 			switch(board.b[i][j]) {
 			case 0:
