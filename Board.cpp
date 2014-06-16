@@ -118,12 +118,6 @@ void Board::UCTSearch(int time) {
 		clone.copyStateFrom(this);
 		clone.playSimulation(*this->root);
 	}
-	/*
-	Node* test = root.getChild();
-	while(test != NULL) {
-		std::cout << test->getWins() << " " << test->getVisits() << std::endl;
-		test = test->getSibling();
-	}*/
 
 	Node* n = getBestChild(*this->root);
 	Node* todelete = this->root;
@@ -252,7 +246,14 @@ void Board::makeRandomMove() {
 	this->makeMove(x, y);
 }
 
+/* Implements human player moves */
 bool Board::makePlayerMove(int x, int y) {
+
+	/* Outside the board */
+	if((x < 0) || (x >= BOARD_SIZE) || (y < 0) || (y >= BOARD_SIZE)) {
+		return false;
+	}
+
 	if(isLegalPlay(x,y)) {
 		int captures = 0;
 		this->ko = false;
@@ -315,11 +316,6 @@ bool Board::makePlayerMove(int x, int y) {
 
 /* Plays random moves until endgame and returns the winner */
 int Board::playRandomGame() {
-	// TODO:
-	// -- Find the end position of a game
-	// -- consider illegal plays in the board
-	// -- Find out who won from an end game
-	
 	int cur_player = this->player;
 	while(!isFinished()) {
 		this->makeRandomMove();
@@ -329,7 +325,6 @@ int Board::playRandomGame() {
 }
 
 /* Checks the board state and returns if the game is finished */
-// TODO
 bool Board::isFinished() {
 	if(this->movements > 65) return true;
 	return false;
@@ -482,6 +477,7 @@ bool Board::isDead(int x, int y) {
 	return (north && west && south && east);
 }
 
+/* Removes a group of stones from the board */
 int Board::removeGroup(int x, int y) {
 	int group = b[x][y];
 
@@ -491,8 +487,6 @@ int Board::removeGroup(int x, int y) {
 	int west = 0;
 
 	b[x][y] = 0;
-	// if(group == 1) captures2++;
-	// else captures1++;
 	// removes north if from the same group
 	if(x > 0 && b[x-1][y] == group) north = removeGroup(x-1,y);
 	// removes east if from the same group
